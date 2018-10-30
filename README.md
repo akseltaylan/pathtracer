@@ -1,2 +1,2 @@
-# pathtracer
-monte carlo path tracer
+# Path Tracer
+monte carlo path tracer in C++
