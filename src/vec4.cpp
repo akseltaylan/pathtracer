@@ -42,7 +42,7 @@ vec4::vec4(double xx, double yy, double zz, double ww) {
 }
 
 // magnitude of vector
-double vec4::length() {
+double vec4::length() const {
 	return sqrt((x*x) + (y*y) + (z*z));
 }
 
@@ -87,6 +87,81 @@ void vec4::clamp(double low, double high) {
 	if (z > high) {
 		z = high;
 	}
+}
+
+bool vec4::operator==(const vec4& v) {
+	return x == v.x && y == v.y && z == v.z;
+}
+
+bool vec4::operator!=(const vec4& v) {
+	return x != v.x || y != v.y || z != v.z;
+}
+
+bool vec4::operator<(const vec4& v) {
+	return this->length() < v.length();
+}
+
+bool vec4::operator<=(const vec4& v) {
+	return length() <= v.length();
+}
+
+bool vec4::operator>(const vec4& v) {
+	return length() > v.length();
+}
+
+bool vec4::operator>=(const vec4& v) {
+	return length() >= v.length();
+}
+
+vec4& vec4::operator=(const vec4& v) {
+	x = v.x;
+	y = v.y;
+	z = v.z;
+	w = v.w;
+	return *this;
+}
+
+vec4& vec4::operator+=(const vec4& v) {
+	x += v.x;
+	y += v.y;
+	z += v.z;
+	return *this;
+}
+
+vec4& vec4::operator-=(const vec4& v) {
+	x -= v.x;
+	y -= v.y;
+	z -= v.z;
+	return *this;
+}
+
+vec4& vec4::operator=(const double c) {
+	x = c;
+	y = c;
+	z = c;
+	w = 1.0;
+	return *this;
+}
+
+vec4& vec4::operator+=(const double c) {
+	x += c;
+	y += c;
+	z += c;
+	return *this;
+}
+
+vec4& vec4::operator-=(const double c) {
+	x -= c;
+	y -= c;
+	z -= c;
+	return *this;
+}
+
+vec4& vec4::operator*=(const double c) {
+	x *= c;
+	y *= c;
+	z *= c;
+	return *this;
 }
 
 // easily output a vector's information
