@@ -164,6 +164,42 @@ vec4& vec4::operator*=(const double c) {
 	return *this;
 }
 
+vec4 operator-(const vec4& a, const vec4& b) {
+	return vec4(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+vec4 operator+(const vec4& a, const vec4& b) {
+	return vec4(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+vec4 operator-(const vec4& a, const double c) {
+	return vec4(a.x - c, a.y - c, a.z - c);
+}
+
+vec4 operator-(const double c, const vec4& a) {
+	return vec4(a.x - c, a.y - c, a.z - c);
+}
+
+vec4 operator+(const vec4& a, const double c) {
+	return vec4(a.x + c, a.y + c, a.z + c);
+}
+
+vec4 operator+(const double c, const vec4& a) {
+	return vec4(a.x + c, a.y + c, a.z + c);
+}
+
+vec4 operator*(const vec4& a, const vec4& b) {
+	return vec4(a.x * b.x, a.y * b.y, a.z * b.z);
+}
+
+vec4 operator*(const double c, const vec4& a) {
+	return vec4(a.x * c, a.y * c, a.z * c);
+}
+
+vec4 operator*(const vec4& a, const double c) {
+	return vec4(a.x * c, a.y * c, a.z * c);
+}
+
 // easily output a vector's information
 std::ostream& operator<<(std::ostream& os, vec4& v) {
 	os << v.x << ", " << v.y << ", " << v.z;
