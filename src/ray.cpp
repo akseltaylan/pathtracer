@@ -1,6 +1,7 @@
 #include "ray.h"
 #include "vec4.h"
 #include "vec2.h"
+#include <limits>
 #include "wavelength.h"
 
 ray::ray() {
