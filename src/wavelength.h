@@ -3,6 +3,11 @@
 
 #include "vec4.h"
 
+/*
+    wavelength utility class
+    color calculation based on samples
+*/
+
 class wavelength {
 
     private:

@@ -1,9 +1,11 @@
 #include "wavelength.h"
+#include "vec4.h"
 
 wavelength::wavelength() {
 
 }
 
+// construct wavelength
 wavelength::wavelength(int s, vec4 col, double nWLx) {
     samples = s;
     totColor = col;
@@ -17,6 +19,10 @@ wavelength::wavelength(int s, vec4 col, double nWLx) {
     }
     nWL = nWLx;
 }
+
+/*
+    ========GETTERS=========
+*/
 
 int wavelength::getNumSamples() {
     return samples;
@@ -40,6 +46,7 @@ double wavelength::getWL() {
 
 vec4 wavelength::getColSample(int num, double r, double& nwl) {
     if (num < samples) {
+        // if low samples (less computation)
         if (samples < 1) {
             nwl = nWL;
             return totColor;
@@ -67,6 +74,6 @@ vec4 wavelength::getColMultiplier(double m) {
         b = 6.0 * m - 5.0;
     }
     vec4 col (r, g, b);
-    col.clamp(0.0, 1.0);
+    col.clamp(0.0, 1.0); // make sure color values are 0-1
     return col;
 }
