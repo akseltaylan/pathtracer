@@ -6,11 +6,6 @@ image::image() : width(500), height(500) {
 	glfwInit();
 	glfwSetTime(0.0);
 
-	if (pWindow)
-	{
-		glfwDestroyWindow(pWindow);
-	}
-
 	pWindow = glfwCreateWindow(width, height, "pathtracer", NULL, NULL);
 
 	glfwMakeContextCurrent(pWindow);
