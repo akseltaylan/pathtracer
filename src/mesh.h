@@ -13,6 +13,8 @@ class mesh {
 		std::vector<vec4> normals;
 		std::vector<face> faces;
 
+		//TODO: will have a material 
+
 		mesh();
 		void debug();
 };
