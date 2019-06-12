@@ -3,8 +3,8 @@
 
 #define GLEW_STATIC
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <GLFW/glfw3.h>
 #include "image.h"
 #include "vec4.h"
 #include "vec2.h"

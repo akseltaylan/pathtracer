@@ -5,17 +5,17 @@ class vec2 {
 
     public:
 
-        double x;
-        double y;
+        float x;
+        float y;
 
         vec2();
-        vec2(double xx, double yy);
-        vec2(double c);
+        vec2(float xx, float yy);
+        vec2(float c);
 
-        vec2& operator*=(const double c);
+        vec2& operator*=(const float c);
 
 	    friend vec2 operator+(const vec2& a, const vec2& b);
-	    friend vec2 operator*(const vec2& a, const double c);
+	    friend vec2 operator*(const vec2& a, const float c);
 
 };
 
