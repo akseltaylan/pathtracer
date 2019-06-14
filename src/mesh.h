@@ -3,6 +3,7 @@
 
 #include "vec4.h"
 #include "vec2.h"
+#include "ray.h"
 #include "face.h"
 #include <vector>
 
@@ -17,5 +18,8 @@ class mesh {
 
 		mesh();
 		void debug();
+		bool rayTriangleIntersect(ray, face, float&);
+		bool intersect(ray, float&);
 };
+
 #endif

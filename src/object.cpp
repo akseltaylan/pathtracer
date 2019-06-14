@@ -73,5 +73,7 @@ bool object::read_data(const char * filepath) {
 	}
 
 	fclose(file);
+
+	return true;
 }
  

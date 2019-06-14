@@ -8,6 +8,7 @@
 #include "mat4.h"
 #include "image.h"
 #include "object.h"
+#include "scene.h"
 #include "mesh.h"
 #include "pathtracer.h"
 #include <iostream>
@@ -20,12 +21,16 @@
 int main() {
 	
 	const char * filepath = ".\\..\\src\\objs\\bunny.obj";
-	object bunny(filepath);
+	object * bunny = new object(filepath);
+	Sphere * sphere = new Sphere(vec4(0.0f, -1.0f, 200.0f), 50.0f);
 
-	bunny.obj_mesh.debug();
+	scene * test = new scene();
+	//test->add_obj(bunny);
+	test->add_obj(sphere);
 	
 	image * img = new image(800,600);
 	pathtracer renderer(img);
+	renderer.set_scene(test);
 	
 	renderer.render();	
 

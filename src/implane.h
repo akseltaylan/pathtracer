@@ -7,8 +7,8 @@
 
 class implane {
 	private:
-		float width;
-		float height;
+		double width;
+		double height;
 		vec4 center;
 		int cur_x;
 		int cur_y;

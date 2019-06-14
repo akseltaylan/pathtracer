@@ -12,12 +12,9 @@ class face {
 		std::vector<int> normals;
 		std::vector<int> uvs;
 
-		face(std::vector<int> pIdxs, std::vector<int> uvIdxs, std::vector<int> nIdxs) {
-			this->pts = pIdxs;
-			this->uvs = uvIdxs;
-			this->normals = nIdxs;
-		};
-		~face() {};
+		face(std::vector<int>, std::vector<int>, std::vector<int>);
+
+		vec4 get_normal(std::vector<vec4>, bool);
 
 	private:
 		bool isQuad;
