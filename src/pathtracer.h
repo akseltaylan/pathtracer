@@ -8,24 +8,25 @@
 #include "image.h"
 #include "implane.h"
 #include "ray.h"
-#include "vec4.h"
 #include "vec2.h"
 #include "scene.h"
 #include "mat4.h"
+#include <chrono>
 
 class pathtracer {
 	public:
 		image * img;
-		vec4 eyept;
+		glm::vec3 eyept;
 		scene * s;
+		int num_rays = 0;
 
 		pathtracer();
 		pathtracer(image*);
 
 		void set_scene(scene *);
 		void render();
-		Sphere * trace(ray&, float&);
-		vec4 cast(ray&);
+		object * trace(const std::vector<object*>&, const ray&, float&);
+		glm::vec3 cast(const std::vector<object*>&, const ray&);
 };
 
 #endif

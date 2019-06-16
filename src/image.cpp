@@ -58,7 +58,7 @@ void image::set_pixel(int x, int y, float R, float G, float B)
 	pixels[(y * width + x) * 3 + 2] = B;
 }
 
-void image::set_pixel(int x, int y, vec4 color)
+void image::set_pixel(int x, int y, glm::vec3 color)
 {
 	pixels[(y * width + x) * 3] = color.x;	   // R	
 	pixels[(y * width + x) * 3 + 1] = color.y; // G

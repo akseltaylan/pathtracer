@@ -34,7 +34,7 @@ bool object::read_data(const char * filepath) {
 		if (linetype == "v") {
 			std::string vx, vy, vz;
 			ss >> vx >> vy >> vz;
-			vec4 vertex(std::stof(vx),std::stof(vy),std::stof(vz));
+			glm::vec3 vertex(std::stof(vx),std::stof(vy),std::stof(vz));
 			obj_mesh.vertices.push_back(vertex);
 		}
 		else if (linetype == "vt") {
@@ -46,7 +46,7 @@ bool object::read_data(const char * filepath) {
 		else if (linetype == "vn") {
 			std::string nx, ny, nz;
 			ss >> nx >> ny >> nz;
-			vec4 normal(std::stof(nx), std::stof(ny), std::stof(nz));
+			glm::vec3 normal(std::stof(nx), std::stof(ny), std::stof(nz));
 			obj_mesh.normals.push_back(normal);
 		}
 		else if (linetype == "f") {
@@ -66,7 +66,33 @@ bool object::read_data(const char * filepath) {
 			}
 
 			face f(fpts, fuvs, fnormals);
+			f.set_normal(obj_mesh.vertices, false);
 			obj_mesh.faces.push_back(f);
+			/*
+			else if (fpts.size() == 4) {
+				float dist1 = glm::distance(obj_mesh.vertices[fpts[0]], obj_mesh.vertices[fpts[1]]);
+				float dist2 = glm::distance(obj_mesh.vertices[fpts[2]], obj_mesh.vertices[fpts[3]]);
+				if (dist1 > dist2) {
+					std::vector<int> fpt1 = { fpts[0],fpts[2],fpts[3] };
+					std::vector<int> fpt2 = { fpts[2],fpts[1],fpts[3] };
+					std::vector<int> fuv1 = { fuvs[0],fuvs[2],fuvs[3] };
+					std::vector<int> fuv2 = { fuvs[2],fuvs[1],fuvs[3] };
+					std::vector<int> fnm1 = { fnormals[0],fnormals[2],fnormals[3] };
+					std::vector<int> fnm2 = { fnormals[2],fnormals[1],fnormals[3] };
+					obj_mesh.faces.push_back(face(fpt1, fuv1, fnm1));
+					obj_mesh.faces.push_back(face(fpt2,fuv2,fnm2));
+				}
+				else {
+					std::vector<int> fpt1 = { fpts[0],fpts[2],fpts[1] };
+					std::vector<int> fpt2 = { fpts[0],fpts[1],fpts[3] };
+					std::vector<int> fuv1 = { fuvs[0],fuvs[2],fuvs[1] };
+					std::vector<int> fuv2 = { fuvs[0],fuvs[1],fuvs[3] };
+					std::vector<int> fnm1 = { fnormals[0],fnormals[2],fnormals[1] };
+					std::vector<int> fnm2 = { fnormals[0],fnormals[1],fnormals[3] };
+					obj_mesh.faces.push_back(face(fpt1, fuv1, fnm1));
+					obj_mesh.faces.push_back(face(fpt2, fuv2, fnm2));
+				}
+			}*/
 		}
 		
 		++count;

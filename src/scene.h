@@ -6,13 +6,13 @@
 
 class scene {
 private:
-	std::vector<Sphere *> objs;
+	std::vector<object *> objs;
 	//TODO: lights will also be in here
 public:
 	scene();
 	~scene();
-	void add_obj(Sphere *);
-	std::vector<Sphere *> get_objs();
+	void add_obj(object *);
+	std::vector<object *> get_objs();
 };
 
 #endif

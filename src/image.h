@@ -6,8 +6,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "vec4.h"
-
 class image {
 	public:
 		int width;
@@ -21,7 +19,7 @@ class image {
 		void draw(void);
 		void clear_image();
 		void set_pixel(int, int, float, float, float);
-		void set_pixel(int, int, vec4);
+		void set_pixel(int, int, glm::vec3);
 		void create_image();
 };
 

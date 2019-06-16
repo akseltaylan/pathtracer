@@ -3,41 +3,42 @@
 pathtracer::pathtracer() {
 	image * im;
 	img = im;
-	eyept = vec4(0.0f, 0.0f, 1000.0f);
+	eyept = glm::vec3(0.0f, 0.0f, 1000.0f);
 }
 
 pathtracer::pathtracer(image * m_img) {
 	img = m_img;
-	eyept = vec4(0.0f, 0.0f, 250.0f);
+	eyept = glm::vec3(0.0f, 0.0f, 20.0f);
 }
 
 void pathtracer::set_scene(scene * _s) {
 	s = _s;
 }
 
-Sphere *  pathtracer::trace(ray & r, float & tNear) {
+object *  pathtracer::trace(const std::vector<object*>& objs, const ray & r, float & tNear) {
 	int closest = -1;
-	Sphere * hit_obj = nullptr;
+	object * hit_obj = nullptr;
 	float max = std::numeric_limits<float>::infinity();
-	for (int i = 0; i < s->get_objs().size(); ++i) {
-		//std::cout << "check obj " << i << std::endl;
+	auto start = std::chrono::high_resolution_clock::now();
+	for (int i = 0; i < objs.size(); ++i) {
 		float tNearTri = max;
-		//if (s->get_objs()[i]->obj_mesh.intersect(r, tNearTri)) {
-		if (s->get_objs()[i]->intersect(r, tNearTri)) {
-			//std::cout << "hit something!" << std::endl;
-			hit_obj = s->get_objs()[i];
+		if (objs[i]->obj_mesh.intersect(r, tNearTri) && tNearTri < tNear) {
+			hit_obj = objs[i];
 			tNear = tNearTri;
 		}
 	}
+	auto stop = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> duration = stop - start;
+	if (DEBUG) std::cout << "Checked all objects in scene for intersections in " << duration.count() << " seconds" << std::endl;
 	return hit_obj;
 }
 
-vec4 pathtracer::cast(ray & r) {
-	vec4 hit_color = vec4(0.0f, 0.0f, 0.0f);
+glm::vec3 pathtracer::cast(const std::vector<object*>& objs, const ray & r) {
+	++num_rays;
+	glm::vec3 hit_color = glm::vec3(0.0f, 0.0f, 0.0f);
 	float tNear = std::numeric_limits<float>::infinity();
-	if (trace(r, tNear) != nullptr) {
-		//std::cout << "do i ever get here?" << std::endl;
-		vec4 hit_pt = r.evaluate(tNear);
+	if (trace(objs, r, tNear) != nullptr) {
+		//glm::vec3 hit_pt = r.evaluate(tNear);
 		hit_color.y = 1.0f;
 	}
 	return hit_color;
@@ -50,19 +51,27 @@ void pathtracer::render() {
 	// TODO: set up scene / get scene data
 
 	implane ip(img->width, img->height);
-
+	int pixel_ct = 1;
+	std::vector<object*> objs = s->get_objs();
 	// TODO: build upon this basic render loop
 	for (int i = 0; i < img->height; ++i) {
 		for (int j = 0; j < img->width; ++j) {
-
-			vec4 pixel_color(0.0f, 0.0f, 0.0f);
-			vec4 cur_pixel = ip.nextpixel();
-			//TODO: figure out what's going on with cur_pixel / ip
+			if (pixel_ct % 1000 == 0) {
+				std::cout << pixel_ct << std::endl;
+			}
+			auto start = std::chrono::high_resolution_clock::now();
+			glm::vec3 pixel_color(0.0f, 0.0f, 0.0f);
+			glm::vec3 cur_pixel = ip.nextpixel();
+			//TODO: implement BVH
 			ray primary_ray(eyept, cur_pixel - eyept);
-			//std::cout << primary_ray.v.x << " " << primary_ray.v.y << " " << primary_ray.v.z << std::endl;
-			//TODO: add color from ray cast here
-			pixel_color = cast(primary_ray);
+			pixel_color = cast(objs,primary_ray);
 			img->set_pixel(j, i, pixel_color);
+			++pixel_ct;
+			if (DEBUG) {
+				auto stop = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<double> duration = stop - start;
+				std::cout << "Computed pixel in " << duration.count() << " seconds" << std::endl;
+			}
 		}
 	}
 

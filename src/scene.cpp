@@ -5,15 +5,15 @@ scene::scene() {
 }
 
 scene::~scene() {
-	for (Sphere * obj : objs) {
+	for (object * obj : objs) {
 		free(obj);
 	}
 }
 
-void scene::add_obj(Sphere * obj) {
+void scene::add_obj(object * obj) {
 	objs.push_back(obj);
 }
 
-std::vector<Sphere *> scene::get_objs() {
+std::vector<object *> scene::get_objs() {
 	return objs;
 }

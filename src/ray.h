@@ -1,17 +1,20 @@
 #ifndef RAY_H
 #define RAY_H
 
-#include "vec4.h"
+#define GLEW_STATIC
+#include <glm/glm.hpp>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 class ray {
 	public:
-		vec4 p;		// starting point
-		vec4 v;		// direction
+		glm::vec3 p;		// starting point
+		glm::vec3 v;		// direction
 		bool isShadowRay;
 
 		ray() {};
-		ray(vec4, vec4);
-		vec4 evaluate(float);
+		ray(glm::vec3, glm::vec3);
+		glm::vec3 evaluate(float);
 };
 
 #endif
