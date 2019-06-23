@@ -23,21 +23,12 @@ void debug_scene(scene * s, pathtracer pt) {
 
 int main() {
 	
-	const char * filepath = ".\\..\\src\\objs\\sphere.obj";
-
-	//auto start = std::chrono::high_resolution_clock::now();
+	const char * filepath = ".\\..\\src\\objs\\bunny.obj";
 	
 	mesh * obj = new mesh(filepath);
-	/*
+	
 	for (int i = 0; i < obj->vertices.size(); ++i) {
 		obj->vertices[i] *= 1000;
-	}*/
-
-	//auto stop = std::chrono::high_resolution_clock::now();
-	//auto duration = std::chrono::duration<double, std::milli>(stop - start).count();
-	if (DEBUG) {
-		//std::cout << "Read in object files in " << duration / 1000 << " seconds" << std::endl;
-		
 	}
 
 	scene * test = new scene();
