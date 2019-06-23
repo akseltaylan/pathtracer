@@ -7,18 +7,17 @@
 #include <exception>
 #include <vector>
 #include <string>
-#include "mesh.h"
+#include "ray.h"
 #include "face.h"
 
 class object {
 	private:
 		
 	public:
-		mesh obj_mesh;
 		object();
-		object(const char *);
-		bool read_data(const char *);
-
+		virtual ~object();
+		virtual bool intersect(const ray&, float&) const = 0;
+		virtual void compute_bounds(glm::vec3, std::vector<float> &) const = 0;
 };
 
 #endif

@@ -7,29 +7,33 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "vec2.h"
+#include "object.h"
 #include "ray.h"
 #include "face.h"
+#include <algorithm>
 #include <vector>
 #include <chrono>
 
-#define DEBUG true
+#define DEBUG false
 
-class mesh {
+class mesh : public object {
 	public:
 		std::vector<glm::vec3> vertices;
 		std::vector<vec2> uvs;
 		std::vector<glm::vec3> normals;
+		int num_tris;
 		std::vector<int> v_idxs;
 		std::vector<int> uv_idxs;
 		std::vector<int> n_idxs;
 		std::vector<face> faces;
 
 		//TODO: will have a material 
-
-		mesh();
+		mesh(const char *);
+		bool get_data(const char *);
 		void debug();
-		bool rayTriangleIntersect(const ray&, const face&, float&);
-		bool intersect(const ray&, float&);
+		bool rayTriangleIntersect(const ray&, const glm::vec3&, const glm::vec3&, const glm::vec3&, float&, const int&) const;
+		bool intersect(const ray&, float&) const;
+		void compute_bounds(glm::vec3, std::vector<float>&) const;
 };
 
 #endif

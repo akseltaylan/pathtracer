@@ -11,7 +11,7 @@ implane::implane() {
 implane::implane(int w, int h) : width(w), height(h) {
 	cur_x = 0;
 	cur_y = 0;
-	center = glm::vec3(0.0f, 0.0f, 0.0f);
+	center = glm::vec3(0.0f, 0.0f, 100.0f);
 }
 
 glm::vec3 implane::nextpixel() {
