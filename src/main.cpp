@@ -26,6 +26,8 @@ int main() {
 	const char * filepath = ".\\..\\src\\objs\\bunny.obj";
 	
 	mesh * obj = new mesh(filepath);
+
+	std::cout << "Number of triangles: " << obj->num_tris << std::endl;
 	
 	for (int i = 0; i < obj->vertices.size(); ++i) {
 		obj->vertices[i] *= 1000;
@@ -35,12 +37,13 @@ int main() {
 	test->add_obj(obj);
 	
 	image * img = new image(640,480);
+
 	pathtracer renderer(img);
 	renderer.set_scene(test);
 
 	renderer.render();
 
 	debug_scene(test, renderer);
-	std::cout << "Number of triangles: " << obj->num_tris << std::endl;
+
 	return 0;
 }

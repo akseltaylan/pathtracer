@@ -9,6 +9,8 @@
 #include "scene.h"
 #include "extents.h"
 #include "object.h"
+#include <queue>
+#include "octree.h"
 
 class bvh {
 	private:
@@ -17,9 +19,10 @@ class bvh {
 		std::vector<extents *> exs;
 	public:
 		scene * s;
+		octree * oct;
 		bvh();
 		bvh(scene*);
-		const object* intersect(const ray &, float);
+		const object* intersect(const ray &, float) const;
 		~bvh();
 };
 

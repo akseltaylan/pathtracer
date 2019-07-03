@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 #include "ray.h"
 #include <iostream>
+#include "object.h"
 
 static const float k_infinity = std::numeric_limits<float>::max();
 
@@ -20,6 +21,8 @@ class extents {
 		extents();
 		std::vector< std::vector<float> > d;
 		bool intersect(const ray &, std::vector<float>, std::vector<float>, float &, float &, int &);
+		void enlarge(const extents &);
+		const object * obj;
 	
 };
 

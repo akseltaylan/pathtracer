@@ -30,3 +30,10 @@ bool extents::intersect(const ray& r, std::vector<float> denoms, std::vector<flo
 	//std::cout << "found an extent!" << std::endl;
 	return true;
 }
+
+void extents::enlarge(const extents& ex) {
+	for (int i = 0; i < num_plane_normals; ++i) {
+		if (d[i][0] > ex.d[i][0]) d[i][0] = ex.d[i][0];
+		if (d[i][1] < ex.d[i][1]) d[i][1] = ex.d[i][1];
+	}
+}
