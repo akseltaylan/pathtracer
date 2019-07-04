@@ -29,6 +29,7 @@ struct octree_node {
 	}
 };
 
+// wrapper for octree noodes to be sorted in a pqueue based on their t value
 struct t_entity {
 	const octree_node * node;
 	float t;
