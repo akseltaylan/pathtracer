@@ -7,7 +7,7 @@
 #include <exception>
 #include <vector>
 #include <string>
-#include "ray.h"
+#include "../ray.h"
 #include "face.h"
 
 class object {

@@ -38,6 +38,7 @@ glm::vec3 pathtracer::cast(const std::vector<object*>& objs, const ray & r) {
 	glm::vec3 hit_color = glm::vec3(0.0f, 0.0f, 0.0f);
 	float t_near = std::numeric_limits<float>::infinity();
 	if (trace(objs, r, t_near)) {
+		// shading will happen here
 		hit_color.y = 1.0f;
 	}
 	return hit_color;

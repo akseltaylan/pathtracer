@@ -2,7 +2,7 @@
 #define SCENE_H
 
 #include <vector>
-#include "object.h"
+#include "geo/object.h"
 
 class scene {
 private:

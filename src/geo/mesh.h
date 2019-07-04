@@ -6,9 +6,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "vec2.h"
+#include "../math/vec2.h"
 #include "object.h"
-#include "ray.h"
+#include "../ray.h"
 #include "face.h"
 #include <algorithm>
 #include <vector>
@@ -31,7 +31,7 @@ class mesh : public object {
 		mesh(const char *);
 		bool get_data(const char *);
 		void debug();
-		bool rayTriangleIntersect(const ray&, const glm::vec3&, const glm::vec3&, const glm::vec3&, float&, const int&) const;
+		bool ray_triangle_intersect(const ray&, const glm::vec3&, const glm::vec3&, const glm::vec3&, float&) const;
 		bool intersect(const ray&, float&) const;
 		void compute_bounds(glm::vec3, std::vector<float>&) const;
 };

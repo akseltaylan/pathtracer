@@ -6,16 +6,16 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "ray.h"
+#include "../ray.h"
 #include <iostream>
-#include "object.h"
+#include "../geo/object.h"
 #include <algorithm>
-#include "extents.h"
+#include "bbox.h"
 
 struct octree_node {
 	std::vector<octree_node*> children;
-	std::vector<const extents*> data;
-	extents extents;
+	std::vector<const bbox*> data;
+	bbox bbox;
 	bool is_leaf;
 	octree_node() : is_leaf(true) {
 		children = std::vector<octree_node*>(8, nullptr);
@@ -29,17 +29,18 @@ struct octree_node {
 	}
 };
 
-struct queue_elem {
+struct t_entity {
 	const octree_node * node;
 	float t;
-	queue_elem(const octree_node * _node, float _t) {
+	t_entity(const octree_node * _node, float _t) {
 		node = _node;
 		t = _t;
 	}
-	friend bool operator < (const queue_elem &a, const queue_elem &b) {
+	friend bool operator < (const t_entity &a, const t_entity &b) {
 		return a.t > b.t;
 	}
 };
+
 class octree {
 	
 	private:
@@ -48,11 +49,11 @@ class octree {
 		octree_node * root;
 		std::vector<glm::vec3> bounds;
 
-		octree(const extents &);
+		octree(const bbox &);
 		~octree();
-		void insert(octree_node *, const extents *, glm::vec3, glm::vec3, int);
+		void insert(octree_node *, const bbox *, glm::vec3, glm::vec3, int);
 		void child_bound(const int &, const glm::vec3 &, const glm::vec3 &, const glm::vec3 &, glm::vec3 &, glm::vec3&) const;
-		void build(octree_node *, const glm::vec3&, const glm::vec3&);
+		void build_tree(octree_node *, const glm::vec3&, const glm::vec3&);
 };
 
 #endif

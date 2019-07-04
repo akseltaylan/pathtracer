@@ -3,11 +3,11 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include "vec2.h"
-#include "mat4.h"
+#include "math/vec2.h"
+#include "math/mat4.h"
 #include "image.h"
 #include "scene.h"
-#include "mesh.h"
+#include "geo/mesh.h"
 #include "pathtracer.h"
 #include <iostream>
 

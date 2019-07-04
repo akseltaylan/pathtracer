@@ -6,9 +6,9 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "scene.h"
-#include "extents.h"
-#include "object.h"
+#include "../scene.h"
+#include "bbox.h"
+#include "../geo/object.h"
 #include <queue>
 #include "octree.h"
 
@@ -16,7 +16,7 @@ class bvh {
 	private:
 		static const int num_plane_normals = 7;
 		static const std::vector<glm::vec3> plane_set_normals;
-		std::vector<extents *> exs;
+		std::vector<bbox *> exs;
 	public:
 		scene * s;
 		octree * oct;

@@ -1,6 +1,6 @@
-#include "extents.h"
+#include "bbox.h"
 
-extents::extents() {
+bbox::bbox() {
 	for (int i = 0; i < num_plane_normals; ++i) {
 		std::vector<float> plane_ds;
 		plane_ds.push_back(k_infinity);
@@ -9,7 +9,7 @@ extents::extents() {
 	}
 }
 
-bool extents::intersect(const ray& r, std::vector<float> denoms, std::vector<float> numers, float& t_near, float& t_far, int& plane_idx) {
+bool bbox::intersect(const ray& r, std::vector<float> denoms, std::vector<float> numers, float& t_near, float& t_far, int& plane_idx) {
 	for (int i = 0; i < num_plane_normals; ++i) {
 		float new_t_near = (d[i][0] - numers[i]) / denoms[i];
 		float new_t_far = (d[i][1] - numers[i]) / denoms[i];
@@ -31,7 +31,7 @@ bool extents::intersect(const ray& r, std::vector<float> denoms, std::vector<flo
 	return true;
 }
 
-void extents::enlarge(const extents& ex) {
+void bbox::enlarge(const bbox& ex) {
 	for (int i = 0; i < num_plane_normals; ++i) {
 		if (d[i][0] > ex.d[i][0]) d[i][0] = ex.d[i][0];
 		if (d[i][1] < ex.d[i][1]) d[i][1] = ex.d[i][1];

@@ -65,31 +65,6 @@ bool mesh::get_data(const char * filepath) {
 			f.set_normal(vertices, false);
 			faces.push_back(f);
 			++num_tris;
-			/*
-			else if (fpts.size() == 4) {
-				float dist1 = glm::distance(obj_mesh.vertices[fpts[0]], obj_mesh.vertices[fpts[1]]);
-				float dist2 = glm::distance(obj_mesh.vertices[fpts[2]], obj_mesh.vertices[fpts[3]]);
-				if (dist1 > dist2) {
-					std::vector<int> fpt1 = { fpts[0],fpts[2],fpts[3] };
-					std::vector<int> fpt2 = { fpts[2],fpts[1],fpts[3] };
-					std::vector<int> fuv1 = { fuvs[0],fuvs[2],fuvs[3] };
-					std::vector<int> fuv2 = { fuvs[2],fuvs[1],fuvs[3] };
-					std::vector<int> fnm1 = { fnormals[0],fnormals[2],fnormals[3] };
-					std::vector<int> fnm2 = { fnormals[2],fnormals[1],fnormals[3] };
-					obj_mesh.faces.push_back(face(fpt1, fuv1, fnm1));
-					obj_mesh.faces.push_back(face(fpt2,fuv2,fnm2));
-				}
-				else {
-					std::vector<int> fpt1 = { fpts[0],fpts[2],fpts[1] };
-					std::vector<int> fpt2 = { fpts[0],fpts[1],fpts[3] };
-					std::vector<int> fuv1 = { fuvs[0],fuvs[2],fuvs[1] };
-					std::vector<int> fuv2 = { fuvs[0],fuvs[1],fuvs[3] };
-					std::vector<int> fnm1 = { fnormals[0],fnormals[2],fnormals[1] };
-					std::vector<int> fnm2 = { fnormals[0],fnormals[1],fnormals[3] };
-					obj_mesh.faces.push_back(face(fpt1, fuv1, fnm1));
-					obj_mesh.faces.push_back(face(fpt2, fuv2, fnm2));
-				}
-			}*/
 		}
 
 		++count;
@@ -117,12 +92,12 @@ void mesh::debug() {
 	std::cout << "total faces count: " << faces.size() << std::endl;
 }
 
-bool mesh::rayTriangleIntersect(const ray& r, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float &t, const int& j) const {
+bool mesh::ray_triangle_intersect(const ray& r, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float &t) const {
 
 	// compute triangle's normal 
-
 	glm::vec3 A = v1 - v0;
 	glm::vec3 B = v2 - v0;
+	
 	glm::vec3 pvec = glm::cross(r.v, B);
 	float det = glm::dot(A, pvec);
 
@@ -134,41 +109,12 @@ bool mesh::rayTriangleIntersect(const ray& r, const glm::vec3& v0, const glm::ve
 	float u = glm::dot(tvec,pvec) * inv_det;
 	if (u < 0 || u > 1) return false;
 
-	// test if ray and triangle are parallel - if so, fails, RETURN false
-	/*
-	float denom = glm::dot(f.normal,r.v);
-	if (denom == 0) return false;*/
-
 	glm::vec3 qvec = glm::cross(tvec,A);
 	float v = glm::dot(r.v,qvec) * inv_det;
 	if (v < 0 || u + v > 1) return false;
 
 	t = glm::dot(B,qvec) * inv_det;
 	return true;
-	// compute t, from which we compute the intersection point
-	/*
-	float D = glm::dot(f.normal,f.v1);
-	float numer = glm::dot(f.normal, r.p) + D;
-	t = numer / denom;
-	if (t < 0) return false;*/
-
-	// test if P is on the left side of each one of the triangle's edges
-	//glm::vec3 phit = r.p + r.v * t;
-
-	// if inside out-test succeeds, RETURN true
-	/*
-	glm::vec3 edge_0 = vertices[f.pts[1]] - vertices[f.pts[0]];
-	glm::vec3 edge_1 = vertices[f.pts[2]] - vertices[f.pts[1]];
-	glm::vec3 edge_2 = vertices[f.pts[0]] - vertices[f.pts[2]];
-	glm::vec3 c0 = phit - vertices[f.pts[0]];
-	glm::vec3 c1 = phit - vertices[f.pts[1]];
-	glm::vec3 c2 = phit - vertices[f.pts[2]];
-	if (
-		glm::dot(f.normal,glm::cross(edge_0,c0)) > 0 &&
-		glm::dot(f.normal, glm::cross(edge_1, c1)) > 0 &&
-		glm::dot(f.normal, glm::cross(edge_2, c2)) > 0) return true;
-	
-	return false;*/
 }
 
 bool mesh::intersect(const ray& r, float& tNear) const {
@@ -180,7 +126,7 @@ bool mesh::intersect(const ray& r, float& tNear) const {
 		const glm::vec3& v1 = vertices[v_idxs[j + 1]];
 		const glm::vec3& v2 = vertices[v_idxs[j + 2]];
 		float t = k_infinity;
-		if (rayTriangleIntersect(r, v0,v1,v2, t, j) && t < tNear) {
+		if (ray_triangle_intersect(r, v0, v1, v2, t) && t < tNear) {
 			tNear = t;
 			intersection |= true;
 		}

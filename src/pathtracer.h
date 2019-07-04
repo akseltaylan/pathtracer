@@ -8,11 +8,11 @@
 #include "image.h"
 #include "implane.h"
 #include "ray.h"
-#include "vec2.h"
-#include "mesh.h"
+#include "math/vec2.h"
+#include "geo/mesh.h"
 #include "scene.h"
-#include "mat4.h"
-#include "bvh.h"
+#include "math/mat4.h"
+#include "accel/bvh.h"
 #include <chrono>
 #include <thread>
 #include <atomic>
