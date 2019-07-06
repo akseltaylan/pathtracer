@@ -22,7 +22,7 @@ class bvh {
 		octree * oct;
 		bvh();
 		bvh(scene*);
-		const object* intersect(const ray &, float) const;
+		const object* intersect(const ray &, float&, int&, float&, float&) const;
 		~bvh();
 };
 

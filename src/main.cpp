@@ -16,25 +16,29 @@
 	used to test things.
 */
 
-void debug_scene(scene * s, pathtracer pt) {
+void debug_scene(scene * s, const pathtracer& pt, const int& total_tris) {
 	std::cout << "Number of objects: " << s->get_objs().size() << std::endl;
+	std::cout << "Total tris: " << total_tris << std::endl;
 	std::cout << "Number of primary rays: " << pt.num_rays << std::endl;
 }
 
 int main() {
 	
-	const char * filepath = ".\\..\\src\\objs\\bunny.obj";
+	const char * bunny_filepath = ".\\..\\src\\objs\\bunny.obj";
+	const char * sphere_filepath = ".\\..\\src\\objs\\sphere.obj";
 	
-	mesh * obj = new mesh(filepath);
-
-	std::cout << "Number of triangles: " << obj->num_tris << std::endl;
+	mesh * bunny = new mesh(bunny_filepath);
+	mesh * sphere = new mesh(sphere_filepath);
 	
-	for (int i = 0; i < obj->vertices.size(); ++i) {
-		obj->vertices[i] *= 1000;
+	for (int i = 0; i < bunny->vertices.size(); ++i) {
+		bunny->vertices[i] *= 1000;
 	}
 
+	int total_tris = 0;
+
 	scene * test = new scene();
-	test->add_obj(obj);
+	test->add_obj(bunny);
+	total_tris += bunny->num_tris;
 	
 	image * img = new image(640,480);
 
@@ -43,7 +47,7 @@ int main() {
 
 	renderer.render();
 
-	debug_scene(test, renderer);
+	debug_scene(test, renderer, total_tris);
 
 	return 0;
 }

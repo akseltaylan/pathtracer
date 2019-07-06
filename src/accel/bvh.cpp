@@ -43,7 +43,7 @@ bvh::~bvh() {
 	}
 }
 
-const object * bvh::intersect(const ray & r, float t_c) const {
+const object * bvh::intersect(const ray & r, float& t_c, int& tri_idx, float& u, float& v) const {
 	float t_closest = t_c;
 	const object * hit = nullptr;
 	std::vector<float> numers, denoms;
@@ -68,7 +68,7 @@ const object * bvh::intersect(const ray & r, float t_c) const {
 		if (node->is_leaf) {
 			for (int i = 0; i < node->data.size(); ++i) {
 				float t = t_f;
-				if (node->data[i]->obj->intersect(r, t)) {
+				if (node->data[i]->obj->intersect(r, t, tri_idx, u, v)) {
 					if (t < t_m) {
 						t_m = t;
 						hit = node->data[i]->obj;

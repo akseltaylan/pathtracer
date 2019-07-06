@@ -16,8 +16,9 @@ class object {
 	public:
 		object();
 		virtual ~object();
-		virtual bool intersect(const ray&, float&) const = 0;
+		virtual bool intersect(const ray&, float&, int&, float&, float&) const = 0;
 		virtual void compute_bounds(glm::vec3, std::vector<float> &) const = 0;
+		virtual void get_shading_properties(glm::vec3&, glm::vec3&, const float&, const float&, const float&, const int&, const ray&) const = 0;
 };
 
 #endif

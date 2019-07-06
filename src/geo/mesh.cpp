@@ -92,7 +92,8 @@ void mesh::debug() {
 	std::cout << "total faces count: " << faces.size() << std::endl;
 }
 
-bool mesh::ray_triangle_intersect(const ray& r, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float &t) const {
+bool mesh::ray_triangle_intersect(const ray& r, const glm::vec3& v0, const glm::vec3& v1,
+								  const glm::vec3& v2, float &t, float& uu, float& vv) const {
 
 	// compute triangle's normal 
 	glm::vec3 A = v1 - v0;
@@ -112,12 +113,13 @@ bool mesh::ray_triangle_intersect(const ray& r, const glm::vec3& v0, const glm::
 	glm::vec3 qvec = glm::cross(tvec,A);
 	float v = glm::dot(r.v,qvec) * inv_det;
 	if (v < 0 || u + v > 1) return false;
-
 	t = glm::dot(B,qvec) * inv_det;
+	uu = u;
+	vv = v;
 	return true;
 }
 
-bool mesh::intersect(const ray& r, float& tNear) const {
+bool mesh::intersect(const ray& r, float& tNear, int& idx, float& u, float& v) const {
 	bool intersection = false;
 	auto start = std::chrono::high_resolution_clock::now();
 	int j = 0;
@@ -126,8 +128,9 @@ bool mesh::intersect(const ray& r, float& tNear) const {
 		const glm::vec3& v1 = vertices[v_idxs[j + 1]];
 		const glm::vec3& v2 = vertices[v_idxs[j + 2]];
 		float t = k_infinity;
-		if (ray_triangle_intersect(r, v0, v1, v2, t) && t < tNear) {
+		if (ray_triangle_intersect(r, v0, v1, v2, t, u, v) && t < tNear) {
 			tNear = t;
+			idx = j;
 			intersection |= true;
 		}
 		j += 3;
@@ -150,5 +153,14 @@ void mesh::compute_bounds(glm::vec3 plane_set_normal, std::vector<float>& ds) co
 	}
 	ds[0] = d_near;
 	ds[1] = d_far;
+}
+
+void mesh::get_shading_properties(glm::vec3& phit, glm::vec3& normal, const float& t_near,
+								  const float& u, const float& v, const int& idx, const ray& r) const {
+	phit = r.evaluate(t_near);
+	const glm::vec3 n0 = normals[idx];
+	const glm::vec3 n1 = normals[idx + 1];
+	const glm::vec3 n2 = normals[idx + 2];
+	normal = (1 - u - v) * n0 + u * n1 + v * n2;
 }
 

@@ -30,10 +30,16 @@ class pathtracer {
 		pathtracer();
 		pathtracer(image*);
 
+		// setter
 		void set_scene(scene *);
+
+		// lighting/shading
+		glm::vec3 compute_direct_lighting(const glm::vec3& phit);
+
+		// core rendering functionality
 		void render();
-		bool trace(const std::vector<object*>&, const ray&, float&);
-		glm::vec3 cast(const std::vector<object*>&, const ray&);
+		const object * trace(const ray&, float&, int&, float&, float&);
+		glm::vec3 cast(const ray&);
 };
 
 #endif

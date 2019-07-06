@@ -14,7 +14,7 @@ class ray {
 
 		ray() {};
 		ray(glm::vec3, glm::vec3);
-		glm::vec3 evaluate(float);
+		glm::vec3 evaluate(float) const;
 };
 
 #endif

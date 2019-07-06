@@ -31,9 +31,10 @@ class mesh : public object {
 		mesh(const char *);
 		bool get_data(const char *);
 		void debug();
-		bool ray_triangle_intersect(const ray&, const glm::vec3&, const glm::vec3&, const glm::vec3&, float&) const;
-		bool intersect(const ray&, float&) const;
+		bool ray_triangle_intersect(const ray&, const glm::vec3&, const glm::vec3&, const glm::vec3&, float&, float&, float&) const;
+		bool intersect(const ray&, float&, int&, float&, float&) const;
 		void compute_bounds(glm::vec3, std::vector<float>&) const;
+		void get_shading_properties(glm::vec3&, glm::vec3&, const float&, const float&, const float&, const int&, const ray&) const;
 };
 
 #endif
