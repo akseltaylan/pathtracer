@@ -9,10 +9,11 @@ pathtracer::pathtracer() {
 pathtracer::pathtracer(image * m_img) {
 	img = m_img;
 	pixels = new float[3 * img->width * img->height];
-	eyept = glm::vec3(0.0f, 0.0f, 1000.0f);
+	eyept = glm::vec3(0.0f,0.0f,1000.0f);
 }
 
 void pathtracer::set_scene(scene * _s) {
+	eyept = _s->get_camera();
 	accel_struct = new bvh(_s);
 }
 
@@ -24,26 +25,28 @@ glm::vec3 pathtracer::compute_direct_lighting(const object * obj, const glm::vec
 
 	// compute ambient contribution
 	const std::vector<light *>& lights = accel_struct->s->get_lights();
-	ambient = (obj->get_albedo() * obj->get_material()->ka) * lights[0]->get_intensity('a');
+	ambient = obj->get_material()->ka * lights[0]->get_intensity('a');
 
 	// go through every light in scene	
 	for (int i = 0; i < lights.size(); ++i) {
 
 		// compute diffuse contribution of light
 		glm::vec3 l_m = normalize(lights[i]->get_pos() - phit);
-		diffuse += obj->get_material()->kd * glm::dot(l_m, hit_normal) * lights[i]->get_intensity('d');
+		if (glm::dot(l_m, hit_normal) > 0) diffuse += obj->get_material()->kd * glm::dot(l_m, hit_normal) * lights[i]->get_intensity('d');
 
 		// compute specular contribution of light
 		glm::vec3 r_m = reflected(-1.f * l_m, hit_normal);		
 		glm::vec3 view = normalize(eyept - phit);
-		if (glm::dot(r_m, view) > 0) specular += obj->get_material()->ks * pow(glm::dot(r_m, view), obj->get_material()->alpha) * lights[i]->get_intensity('s');
+		if (glm::dot(r_m, view) > 0 && glm::dot(l_m, hit_normal) > 0) {
+			specular += obj->get_material()->ks * lights[i]->get_intensity('s') * powf(glm::dot(r_m, view), obj->get_material()->alpha);
+		}
 	}
 
 	dl_contrib += ambient;
 	dl_contrib += diffuse;
-	dl_contrib += specular;
+	//dl_contrib += specular;
 
-	return dl_contrib;
+	return dl_contrib * obj->get_albedo();
 }
 
 const object * pathtracer::trace(const ray & r, float & t_near, int& tri_idx, float& u, float& v) {
@@ -92,7 +95,7 @@ void pathtracer::render() {
 			pixel_color = cast(primary_ray);
 			img->set_pixel(j, i, pixel_color);
 
-			if (DEBUG) {
+			if (PIXEL_DEBUG) {
 				auto stop = std::chrono::high_resolution_clock::now();
 				auto duration = std::chrono::duration<double, std::milli>(stop - start).count();
 				std::cout << "Computed pixel in " << duration / 1000 << " seconds" << std::endl;

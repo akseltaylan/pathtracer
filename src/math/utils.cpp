@@ -1,7 +1,7 @@
 #include "utils.h"
 
 glm::vec3 normalize(const glm::vec3& v) {
-	float denom = sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2));
+	float denom = sqrt(powf(v.x, 2) + powf(v.y, 2) + powf(v.z, 2));
 	return v / denom;
 }
 

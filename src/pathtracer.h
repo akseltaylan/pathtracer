@@ -20,6 +20,8 @@
 #include <future>
 #include "omp.h"
 
+#define PIXEL_DEBUG false
+
 class pathtracer {
 	public:
 		image * img;

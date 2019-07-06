@@ -14,8 +14,6 @@ bool mesh::get_data(const char * filepath) {
 		return false;
 	}
 
-	std::vector< unsigned int > v_indices, uv_indices, normal_indices;
-
 	// parse obj data
 
 	int count = 1;
@@ -36,7 +34,7 @@ bool mesh::get_data(const char * filepath) {
 			ss >> uu >> vv;
 			vec2 uv(std::stof(uu), std::stof(vv));
 			uvs.push_back(uv);
-		}
+		}		
 		else if (linetype == "vn") {
 			std::string nx, ny, nz;
 			ss >> nx >> ny >> nz;
@@ -51,7 +49,7 @@ bool mesh::get_data(const char * filepath) {
 			ss >> fstr;
 
 			while (!ss.eof()) {
-				int pIdx, vIdx, nIdx;
+				int pIdx, vIdx, nIdx = 0;
 				sscanf(fstr.c_str(), "%d/%d/%d", &pIdx, &vIdx, &nIdx);
 				fpts.push_back(pIdx - 1);
 				v_idxs.push_back(pIdx - 1);
@@ -62,7 +60,6 @@ bool mesh::get_data(const char * filepath) {
 				ss >> fstr;
 			}
 			face f(fpts, fuvs, fnormals);
-			f.set_normal(vertices, false);
 			faces.push_back(f);
 			++num_tris;
 		}
@@ -72,7 +69,21 @@ bool mesh::get_data(const char * filepath) {
 
 	fclose(file);
 
+	if (DEBUG) debug(filepath);
+
 	return true;
+}
+
+void mesh::populate_normals() {
+	if (normals.size() == 0) {
+		normals = std::vector<glm::vec3>(vertices.size(), glm::vec3(0.0f));
+		for (auto& f : faces) {
+			f.set_normal(vertices, true);
+			normals[f.pts[0]] += f.normal;
+			normals[f.pts[1]] += f.normal;
+			normals[f.pts[2]] += f.normal;
+		}
+	}
 }
 
 mesh::mesh(const char * filepath) {
@@ -85,15 +96,19 @@ mesh::mesh(const char * filepath) {
 	faces = std::vector<face>();
 	num_tris = 0;
 	get_data(filepath);
+	populate_normals();
 }
 
-void mesh::debug() {
-	std::cout << "total vertex count: " << vertices.size() << std::endl;
-	std::cout << "total faces count: " << faces.size() << std::endl;
+void mesh::debug(const char * filepath) {
+	std::cout << "Geo data for " << filepath << ": " << std::endl;
+	std::cout << "Total vertex count: " << vertices.size() << std::endl;
+	std::cout << "Total faces count: " << faces.size() << std::endl;
+	std::cout << "Total normals count: " << normals.size() << std::endl;
+	std::cout << "---" << std::endl;
 }
 
 bool mesh::ray_triangle_intersect(const ray& r, const glm::vec3& v0, const glm::vec3& v1,
-								  const glm::vec3& v2, float &t, float& uu, float& vv) const {
+								  const glm::vec3& v2, float &t, float& u, float& v) const {
 
 	// compute triangle's normal 
 	glm::vec3 A = v1 - v0;
@@ -107,38 +122,37 @@ bool mesh::ray_triangle_intersect(const ray& r, const glm::vec3& v0, const glm::
 
 	float inv_det = 1 / det;
 	glm::vec3 tvec = r.p - v0;
-	float u = glm::dot(tvec,pvec) * inv_det;
+	u = glm::dot(tvec,pvec) * inv_det;
 	if (u < 0 || u > 1) return false;
 
 	glm::vec3 qvec = glm::cross(tvec,A);
-	float v = glm::dot(r.v,qvec) * inv_det;
+	v = glm::dot(r.v,qvec) * inv_det;
 	if (v < 0 || u + v > 1) return false;
 	t = glm::dot(B,qvec) * inv_det;
-	uu = u;
-	vv = v;
-	return true;
+	return (t > 0) ? true : false;
 }
 
 bool mesh::intersect(const ray& r, float& tNear, int& idx, float& u, float& v) const {
 	bool intersection = false;
 	auto start = std::chrono::high_resolution_clock::now();
 	int j = 0;
-	for (int i = 0; i < faces.size() - 2; ++i) {
-		const glm::vec3& v0 = vertices[v_idxs[j]];
-		const glm::vec3& v1 = vertices[v_idxs[j + 1]];
-		const glm::vec3& v2 = vertices[v_idxs[j + 2]];
+	
+	for (int i = 0; i < faces.size(); ++i) {
 		float t = k_infinity;
-		if (ray_triangle_intersect(r, v0, v1, v2, t, u, v) && t < tNear) {
+		float uu = 0.0f;
+		float vv = 0.0f;
+		if (ray_triangle_intersect(r, vertices[faces[i].pts[0]], vertices[faces[i].pts[1]], vertices[faces[i].pts[2]], t, uu, vv) && t < tNear) {
 			tNear = t;
-			idx = j;
+			idx = i;
+			u = uu;
+			v = vv;
 			intersection |= true;
 		}
-		j += 3;
 	}
 
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration<double, std::milli>(stop - start).count();
-	if (DEBUG) std::cout << "Checked all triangles in object for intersections in " << duration/1000 << " seconds" << std::endl;
+	if (MESH_DEBUG) std::cout << "Checked all triangles in object for intersections in " << duration/1000 << " seconds" << std::endl;
 
 	return intersection;
 }
@@ -157,11 +171,19 @@ void mesh::compute_bounds(glm::vec3 plane_set_normal, std::vector<float>& ds) co
 
 void mesh::get_shading_properties(glm::vec3& phit, glm::vec3& normal, const float& t_near,
 								  const float& u, const float& v, const int& idx, const ray& r) const {
-	phit = r.p + (r.v * t_near);
-	const glm::vec3 v0 = vertices[v_idxs[idx]];
-	const glm::vec3 v1 = vertices[v_idxs[idx + 1]];
-	const glm::vec3 v2 = vertices[v_idxs[idx + 2]];
-	normal = normalize(glm::cross((v1 - v0), (v2 - v0)));
-	//normal = (1 - u - v) * n0 + u * n1 + v * n2;
+	phit = r.evaluate(t_near);
+	bool smooth = true;
+	if (!smooth) {
+		const glm::vec3 v0 = vertices[faces[idx].pts[0]];
+		const glm::vec3 v1 = vertices[faces[idx].pts[1]];
+		const glm::vec3 v2 = vertices[faces[idx].pts[2]];
+		normal = normalize(glm::cross((v1 - v0), (v2 - v0)));
+	}
+	else {
+		const glm::vec3 n0 = normals[faces[idx].pts[0]];
+		const glm::vec3 n1 = normals[faces[idx].pts[1]];
+		const glm::vec3 n2 = normals[faces[idx].pts[2]];
+		normal = normalize((1 - u - v) * n0 + u * n1 + v * n2);
+	}
 }
 
