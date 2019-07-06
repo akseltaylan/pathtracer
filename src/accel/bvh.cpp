@@ -71,6 +71,7 @@ const object * bvh::intersect(const ray & r, float& t_c, int& tri_idx, float& u,
 				if (node->data[i]->obj->intersect(r, t, tri_idx, u, v)) {
 					if (t < t_m) {
 						t_m = t;
+						t_c = t;
 						hit = node->data[i]->obj;
 					}
 				}

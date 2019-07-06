@@ -157,10 +157,11 @@ void mesh::compute_bounds(glm::vec3 plane_set_normal, std::vector<float>& ds) co
 
 void mesh::get_shading_properties(glm::vec3& phit, glm::vec3& normal, const float& t_near,
 								  const float& u, const float& v, const int& idx, const ray& r) const {
-	phit = r.evaluate(t_near);
-	const glm::vec3 n0 = normals[idx];
-	const glm::vec3 n1 = normals[idx + 1];
-	const glm::vec3 n2 = normals[idx + 2];
-	normal = (1 - u - v) * n0 + u * n1 + v * n2;
+	phit = r.p + (r.v * t_near);
+	const glm::vec3 v0 = vertices[v_idxs[idx]];
+	const glm::vec3 v1 = vertices[v_idxs[idx + 1]];
+	const glm::vec3 v2 = vertices[v_idxs[idx + 2]];
+	normal = normalize(glm::cross((v1 - v0), (v2 - v0)));
+	//normal = (1 - u - v) * n0 + u * n1 + v * n2;
 }
 

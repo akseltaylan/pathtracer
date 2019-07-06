@@ -8,9 +8,10 @@
 #include "light.h"
 
 class point_light: public light {
-	point_light();
-	point_light(glm::vec3, glm::vec3);
-	glm::vec3 get_pos();
+	public:
+		point_light();
+		point_light(const glm::vec3&);
+		glm::vec3 get_pos();
 };
 
 #endif

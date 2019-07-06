@@ -16,6 +16,36 @@ void pathtracer::set_scene(scene * _s) {
 	accel_struct = new bvh(_s);
 }
 
+glm::vec3 pathtracer::compute_direct_lighting(const object * obj, const glm::vec3& phit, const glm::vec3& hit_normal) {
+	glm::vec3 dl_contrib(0.0f, 0.0f, 0.0f);
+	glm::vec3 ambient(0.0f);
+	glm::vec3 diffuse(0.0f);
+	glm::vec3 specular(0.0f);
+
+	// compute ambient contribution
+	const std::vector<light *>& lights = accel_struct->s->get_lights();
+	ambient = (obj->get_albedo() * obj->get_material()->ka) * lights[0]->get_intensity('a');
+
+	// go through every light in scene	
+	for (int i = 0; i < lights.size(); ++i) {
+
+		// compute diffuse contribution of light
+		glm::vec3 l_m = normalize(lights[i]->get_pos() - phit);
+		diffuse += obj->get_material()->kd * glm::dot(l_m, hit_normal) * lights[i]->get_intensity('d');
+
+		// compute specular contribution of light
+		glm::vec3 r_m = reflected(-1.f * l_m, hit_normal);		
+		glm::vec3 view = normalize(eyept - phit);
+		if (glm::dot(r_m, view) > 0) specular += obj->get_material()->ks * pow(glm::dot(r_m, view), obj->get_material()->alpha) * lights[i]->get_intensity('s');
+	}
+
+	dl_contrib += ambient;
+	dl_contrib += diffuse;
+	dl_contrib += specular;
+
+	return dl_contrib;
+}
+
 const object * pathtracer::trace(const ray & r, float & t_near, int& tri_idx, float& u, float& v) {
 	int closest = -1;
 	const object * hit_obj = nullptr;
@@ -32,10 +62,11 @@ glm::vec3 pathtracer::cast(const ray & r) {
 	int tri_idx = -1;
 	const object * obj = trace(r, t_near, tri_idx, u, v);
 	if (obj != nullptr) {
-		glm::vec3 phit, hit_normal;
-		//obj->get_shading_properties(phit, hit_normal, t_near, u, v, tri_idx, r);
-		// shading will happen here
-		hit_color.y = 1.0f;
+		glm::vec3 phit = glm::vec3(0.0f);
+		glm::vec3 hit_normal = glm::vec3(0.0f);
+		obj->get_shading_properties(phit, hit_normal, t_near, u, v, tri_idx, r);
+		hit_color += compute_direct_lighting(obj, phit, hit_normal);
+		//hit_color = obj->get_albedo();
 	}
 	return hit_color;
 }

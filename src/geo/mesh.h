@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "../math/vec2.h"
+#include "../math/utils.h"
 #include "object.h"
 #include "../ray.h"
 #include "face.h"

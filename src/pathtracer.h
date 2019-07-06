@@ -9,6 +9,7 @@
 #include "implane.h"
 #include "ray.h"
 #include "math/vec2.h"
+#include "math/utils.h"
 #include "geo/mesh.h"
 #include "scene.h"
 #include "math/mat4.h"
@@ -34,7 +35,7 @@ class pathtracer {
 		void set_scene(scene *);
 
 		// lighting/shading
-		glm::vec3 compute_direct_lighting(const glm::vec3& phit);
+		glm::vec3 compute_direct_lighting(const object *, const glm::vec3&, const glm::vec3&);
 
 		// core rendering functionality
 		void render();
