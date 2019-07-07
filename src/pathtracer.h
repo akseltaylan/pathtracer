@@ -2,9 +2,11 @@
 #define PATHTRACER_H
 
 #define GLEW_STATIC
+#define GLM_ENABLE_EXPERIMENTAL
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
+#include <glm/gtx/transform.hpp>
 #include "image.h"
 #include "implane.h"
 #include "ray.h"
@@ -21,11 +23,13 @@
 #include "omp.h"
 
 #define PIXEL_DEBUG false
+#define PI 3.14159265354f
 
 class pathtracer {
 	public:
 		image * img;
 		glm::vec3 eyept;
+		scene * s;
 		bvh * accel_struct;
 		int num_rays = 0;
 		float * pixels;
@@ -38,6 +42,7 @@ class pathtracer {
 
 		// lighting/shading
 		glm::vec3 compute_direct_lighting(const object *, const glm::vec3&, const glm::vec3&);
+		bool in_shadow(const ray&, const glm::vec3&);
 
 		// core rendering functionality
 		void render();

@@ -13,6 +13,8 @@ private:
 	std::vector<light *> lights;
 	glm::vec3 camera;
 public:
+	glm::vec3 bg_color;
+
 	scene();
 	~scene();
 	void add_obj(object *);

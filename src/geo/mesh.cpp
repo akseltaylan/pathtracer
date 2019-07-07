@@ -86,6 +86,21 @@ void mesh::populate_normals() {
 	}
 }
 
+void mesh::set_to_origin() {
+	
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 640.0f / 480.0f, 0.1f, 100.0f);
+	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 1000), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	glm::mat4 model = transform;
+	glm::mat4 mvp = projection * view * model;
+
+	/*
+	for (int i = 0; i < vertices.size(); ++i) {
+		glm::vec4 pt = glm::vec4(vertices[i], 1.0f);
+		pt = glm::mat4(1.0f) * pt;
+		vertices[i] = glm::vec3(pt.x, pt.y, pt.z);
+	}*/
+}
+
 mesh::mesh(const char * filepath) {
 	vertices = std::vector<glm::vec3>();
 	uvs = std::vector<vec2>();
@@ -97,6 +112,8 @@ mesh::mesh(const char * filepath) {
 	num_tris = 0;
 	get_data(filepath);
 	populate_normals();
+	set_to_origin();
+
 }
 
 void mesh::debug(const char * filepath) {

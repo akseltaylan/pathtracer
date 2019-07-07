@@ -2,7 +2,9 @@
 #define MESH_H
 
 #define GLEW_STATIC
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -38,6 +40,7 @@ class mesh : public object {
 		void compute_bounds(glm::vec3, std::vector<float>&) const;
 		void get_shading_properties(glm::vec3&, glm::vec3&, const float&, const float&, const float&, const int&, const ray&) const;
 		void populate_normals();
+		void set_to_origin();
 };
 
 #endif

@@ -21,7 +21,7 @@ int main() {
 
 	scene * test = new scene();
 	test->bunny_setup();
-	
+
 	image * img = new image(640,480);
 
 	pathtracer renderer(img);
