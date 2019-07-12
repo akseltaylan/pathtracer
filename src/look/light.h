@@ -9,15 +9,14 @@
 class light {
 	protected:
 		glm::vec3 position;
-		glm::vec3 ia;
-		glm::vec3 id;
-		glm::vec3 is;
+		float intensity;
+		glm::vec3 color;
 	public:
 		light();
-		light(const glm::vec3&);
-		virtual glm::vec3 get_pos() = 0;
-		glm::vec3 get_intensity(const char&);
-		void set_intensity(const glm::vec3&, const glm::vec3&, const glm::vec3&);
+		float get_intensity() const;
+		glm::vec3 get_color() const;
+		void set_intensity(const float&);
+		virtual glm::vec3 get_pos() const = 0;
 };
 
 #endif

@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include <vector>
-#include "geo/object.h"
+#include <algorithm>
 
 class implane {
 	private:
@@ -15,10 +15,12 @@ class implane {
 		glm::vec3 center;
 		int cur_x;
 		int cur_y;
+		
 	public:
 		implane();
 		implane(int, int);
-		glm::vec3 nextpixel();
+		glm::vec3 nextpixel(const int&, const int&, const int&);
+		static const std::vector<float> jitter_matrix;
 };
 
 #endif

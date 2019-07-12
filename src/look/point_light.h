@@ -10,8 +10,8 @@
 class point_light: public light {
 	public:
 		point_light();
-		point_light(const glm::vec3&);
-		glm::vec3 get_pos();
+		point_light(const glm::vec3&, const float&, const glm::vec3&);
+		glm::vec3 get_pos() const;
 };
 
 #endif

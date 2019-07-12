@@ -17,13 +17,13 @@
 #include "math/mat4.h"
 #include "accel/bvh.h"
 #include <chrono>
-#include <thread>
-#include <atomic>
-#include <future>
-#include "omp.h"
+#include <time.h>
+#include <stdlib.h>
+#include <random>
 
 #define PIXEL_DEBUG false
 #define PI 3.14159265354f
+#define MAX_DEPTH 2
 
 class pathtracer {
 	public:
@@ -41,13 +41,16 @@ class pathtracer {
 		void set_scene(scene *);
 
 		// lighting/shading
-		glm::vec3 compute_direct_lighting(const object *, const glm::vec3&, const glm::vec3&);
+		glm::vec3 compute_direct_lighting(const object *, const glm::vec3&, const glm::vec3&, const bool&);
 		bool in_shadow(const ray&, const glm::vec3&);
+		void shade_coord_system(const glm::vec3&, glm::vec3&, glm::vec3&);
+		glm::vec3 get_uniform_hemisphere_sample(const float&, const float&);
+		glm::vec3 convert_sample(const glm::vec3&, const glm::vec3&, const glm::vec3&, const glm::vec3&);
 
 		// core rendering functionality
 		void render();
 		const object * trace(const ray&, float&, int&, float&, float&);
-		glm::vec3 cast(const ray&);
+		glm::vec3 cast(const ray&, const int&);
 };
 
 #endif

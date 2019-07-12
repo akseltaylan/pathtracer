@@ -36,7 +36,7 @@ void scene::bunny_setup() {
 	const char * filepath = ".\\..\\src\\objs\\bunny.obj";	
 	mesh * bunny = new mesh(filepath);
 	for (int i = 0; i < bunny->vertices.size(); ++i) {
-		bunny->vertices[i] *= 1000;
+		bunny->vertices[i] *= 1000.0f;
 	}
 	bunny->set_albedo(glm::vec3(0.0f, 0.0f, 0.7f));
 	bunny->set_material(new material(0.05f, 0.95f, 0.1f, 16.0f));
@@ -46,7 +46,7 @@ void scene::bunny_setup() {
 	filepath = ".\\..\\src\\objs\\plane.obj";
 	mesh * plane = new mesh(filepath);
 	for (int i = 0; i < plane->vertices.size(); ++i) {
-		plane->vertices[i] *= 100;
+		plane->vertices[i] *= 100.0f;
 
 	}
 	plane->set_albedo(glm::vec3(0.9f, 0.9f, 0.9f));
@@ -54,8 +54,7 @@ void scene::bunny_setup() {
 	add_obj(plane);
 
 	// create light
-	point_light * pl1 = new point_light(glm::vec3(0.0f, 400.0f, 250.0f));
-	pl1->set_intensity(glm::vec3(0.9f), glm::vec3(0.9f), glm::vec3(0.9f));
+	point_light * pl1 = new point_light(glm::vec3(0.0f, 400.0f, 250.0f), 0.9f, glm::vec3(1.0f));
 	add_light(pl1);
 
 	// set camera pos
@@ -87,8 +86,7 @@ void scene::sphere_setup() {
 	add_obj(plane);
 
 	// create light
-	point_light * pl1 = new point_light(glm::vec3(-2.0f, 2.0f, 21.0f));
-	pl1->set_intensity(glm::vec3(0.9f), glm::vec3(0.9f), glm::vec3(0.9f));
+	point_light * pl1 = new point_light(glm::vec3(-2.0f, 2.0f, 21.0f), 0.9f, glm::vec3(1.0f));
 	add_light(pl1);
 
 	// set camera pos
@@ -96,4 +94,46 @@ void scene::sphere_setup() {
 
 	// set bg color
 	bg_color = glm::vec3(0.0f);
+}
+
+void scene::gl_test_setup() {
+	// create sphere
+	const char * filepath = ".\\..\\src\\objs\\sphere.obj";
+	mesh * sphere = new mesh(filepath);
+	for (int i = 0; i < sphere->vertices.size(); ++i) {
+		sphere->vertices[i] *= 2.0f;
+	}
+	sphere->set_albedo(glm::vec3(0.0f, 1.0f, 0.0f));
+	sphere->set_material(new material(0.05f, 0.95f, 0.35f, 32.0f));
+	add_obj(sphere);
+
+	mesh * sphere2 = new mesh(filepath);
+	for (int i = 0; i < sphere2->vertices.size(); ++i) {
+		sphere2->vertices[i] *= 2.0f;
+		sphere2->vertices[i].x -= 80.0f;
+	}
+	sphere2->set_albedo(glm::vec3(1.0f, 0.0f, 0.0f));
+	sphere2->set_material(new material(0.05f, 0.95f, 0.35f, 32.0f));
+	add_obj(sphere2);
+
+	// floor
+	filepath = ".\\..\\src\\objs\\plane.obj";
+	mesh * plane = new mesh(filepath);
+	for (int i = 0; i < plane->vertices.size(); ++i) {
+		plane->vertices[i] *= 100.0f;
+
+	}
+	plane->set_albedo(glm::vec3(0.9f, 0.9f, 0.9f));
+	plane->set_material(new material(0.1f, 0.8f, 0.2f, 1.0f));
+	add_obj(plane);
+
+	// create light
+	point_light * pl1 = new point_light(glm::vec3(0.0f, 400.0f, 250.0f), 0.9f, glm::vec3(1.0f));
+	add_light(pl1);
+
+	// set camera pos
+	camera = glm::vec3(0.0f, 0.0f, 1000.0f);
+
+	// set bg color
+	bg_color = glm::vec3(0.5f);
 }

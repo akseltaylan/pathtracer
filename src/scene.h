@@ -26,6 +26,7 @@ public:
 	// example scene set ups
 	void bunny_setup();
 	void sphere_setup();
+	void gl_test_setup();
 };
 
 #endif
