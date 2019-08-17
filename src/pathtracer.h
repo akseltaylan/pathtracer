@@ -23,7 +23,7 @@
 
 #define PIXEL_DEBUG false
 #define PI 3.14159265354f
-#define MAX_DEPTH 2
+#define MAX_DEPTH 1
 
 class pathtracer {
 	public:

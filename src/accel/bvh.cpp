@@ -34,6 +34,7 @@ bvh::bvh(scene * ss) {
 		oct->insert(oct->root, exs[i], oct->bounds[0], oct->bounds[1], 0);
 	}
 	oct->build_tree(oct->root, oct->bounds[0], oct->bounds[1]);
+	std::cout << "octree node count: " << oct->debug(oct->root) << std::endl;
 }
 
 bvh::~bvh() {

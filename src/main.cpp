@@ -20,7 +20,7 @@ void debug_scene(scene * s, const pathtracer& pt) {
 int main() {
 
 	scene * test = new scene();
-	test->gl_test_setup();
+	test->texture_setup();
 
 	image * img = new image(640,480);
 

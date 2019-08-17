@@ -32,7 +32,7 @@ bool mesh::get_data(const char * filepath) {
 		else if (linetype == "vt") {
 			std::string uu, vv;
 			ss >> uu >> vv;
-			vec2 uv(std::stof(uu), std::stof(vv));
+			glm::vec2 uv(std::stof(uu), std::stof(vv));
 			uvs.push_back(uv);
 		}		
 		else if (linetype == "vn") {
@@ -59,6 +59,7 @@ bool mesh::get_data(const char * filepath) {
 				n_idxs.push_back(nIdx - 1);
 				ss >> fstr;
 			}
+			
 			face f(fpts, fuvs, fnormals);
 			faces.push_back(f);
 			++num_tris;
@@ -103,7 +104,7 @@ void mesh::set_to_origin() {
 
 mesh::mesh(const char * filepath) {
 	vertices = std::vector<glm::vec3>();
-	uvs = std::vector<vec2>();
+	uvs = std::vector<glm::vec2>();
 	normals = std::vector<glm::vec3>();
 	v_idxs = std::vector<int>();
 	uv_idxs = std::vector<int>();
@@ -186,8 +187,10 @@ void mesh::compute_bounds(glm::vec3 plane_set_normal, std::vector<float>& ds) co
 	ds[1] = d_far;
 }
 
+float clamp(float a, float min, float max) { return a < min ? min : a > max ? max : a; }
+
 void mesh::get_shading_properties(glm::vec3& phit, glm::vec3& normal, const float& t_near,
-								  const float& u, const float& v, const int& idx, const ray& r) const {
+								  const float& u, const float& v, const int& idx, const ray& r, glm::vec2& uv_coords) const {
 	phit = r.evaluate(t_near);
 	bool smooth = true;
 	if (!smooth) {
@@ -201,6 +204,9 @@ void mesh::get_shading_properties(glm::vec3& phit, glm::vec3& normal, const floa
 		const glm::vec3 n1 = normals[faces[idx].pts[1]];
 		const glm::vec3 n2 = normals[faces[idx].pts[2]];
 		normal = normalize((1 - u - v) * n0 + u * n1 + v * n2);
+	}
+	if (uvs.size() > 0) {
+		uv_coords = uvs[faces[idx].uvs[1]]*u + uvs[faces[idx].uvs[2]]*v + uvs[faces[idx].uvs[0]]*(1.0f - u - v);
 	}
 }
 

@@ -115,7 +115,8 @@ void octree::build_tree(octree_node * node, const glm::vec3 & b_min, const glm::
 	else {
 		for (int i = 0; i < 8; ++i) {
 			if (node->children[i]) {
-				glm::vec3 child_b_min, child_b_max;
+				glm::vec3 child_b_min(0.0f);
+				glm::vec3 child_b_max(0.0f);
 				glm::vec3 bound_centroid = (b_min + b_max) * 0.5f;
 
 				child_bound(i, bound_centroid, b_min, b_max, child_b_min, child_b_max);
@@ -129,4 +130,20 @@ void octree::build_tree(octree_node * node, const glm::vec3 & b_min, const glm::
 
 octree::~octree() {
 	delete root;
+}
+
+int octree::debug(octree_node * node) {
+	if (node == nullptr) return 0;
+	if (node->is_leaf) {
+		std::cout << "found leaf" << std::endl;
+		std::cout << "leaf " << node << " has" << node->data.size() << " data" << std::endl;
+		return 1;
+	}
+	int amtNodes = 0;
+	std::cout << "node " << node << " has" << node->children.size() << " children" << std::endl;
+	
+	for (int i = 0; i < node->children.size(); ++i) {
+		amtNodes += debug(node->children[i]);
+	}
+	return amtNodes;
 }

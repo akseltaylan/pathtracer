@@ -6,6 +6,7 @@
 #include "geo/mesh.h"
 #include "look/light.h"
 #include "look/point_light.h"
+#include "look/area_light.h"
 
 class scene {
 private:
@@ -25,8 +26,8 @@ public:
 	
 	// example scene set ups
 	void bunny_setup();
-	void sphere_setup();
 	void gl_test_setup();
+	void texture_setup();
 };
 
 #endif

@@ -18,6 +18,7 @@ class object {
 	public:
 		glm::mat4 transform = glm::mat4(1.0f);
 		glm::mat4 inv_transform = glm::inverse(transform);
+		bool is_light = false;
 
 		object();
 		virtual ~object();
@@ -27,7 +28,7 @@ class object {
 		void set_material(material *);
 		virtual bool intersect(const ray&, float&, int&, float&, float&) const = 0;
 		virtual void compute_bounds(glm::vec3, std::vector<float> &) const = 0;
-		virtual void get_shading_properties(glm::vec3&, glm::vec3&, const float&, const float&, const float&, const int&, const ray&) const = 0;
+		virtual void get_shading_properties(glm::vec3&, glm::vec3&, const float&, const float&, const float&, const int&, const ray&, glm::vec2&) const = 0;
 };
 
 #endif

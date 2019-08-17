@@ -55,6 +55,7 @@ class octree {
 		void insert(octree_node *, const bbox *, glm::vec3, glm::vec3, int);
 		void child_bound(const int &, const glm::vec3 &, const glm::vec3 &, const glm::vec3 &, glm::vec3 &, glm::vec3&) const;
 		void build_tree(octree_node *, const glm::vec3&, const glm::vec3&);
+		int debug(octree_node *);
 };
 
 #endif

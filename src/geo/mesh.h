@@ -23,7 +23,7 @@
 class mesh : public object {
 	public:
 		std::vector<glm::vec3> vertices;
-		std::vector<vec2> uvs;
+		std::vector<glm::vec2> uvs;
 		std::vector<glm::vec3> normals;
 		int num_tris;
 		std::vector<int> v_idxs;
@@ -38,7 +38,7 @@ class mesh : public object {
 		bool ray_triangle_intersect(const ray&, const glm::vec3&, const glm::vec3&, const glm::vec3&, float&, float&, float&) const;
 		bool intersect(const ray&, float&, int&, float&, float&) const;
 		void compute_bounds(glm::vec3, std::vector<float>&) const;
-		void get_shading_properties(glm::vec3&, glm::vec3&, const float&, const float&, const float&, const int&, const ray&) const;
+		void get_shading_properties(glm::vec3&, glm::vec3&, const float&, const float&, const float&, const int&, const ray&, glm::vec2&) const;
 		void populate_normals();
 		void set_to_origin();
 };
