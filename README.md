@@ -17,7 +17,7 @@
 - Texture Mapping
 - Gamma Correction
 
-This is a personal project I work on in my free time - it's currently in active development; verbose debug statements will be removed and lack of organization will be improved! I promise! OpenGL is used only to display the rendered image. I also use glm's math library.
+This is a personal project; I teach myself the material as I go and work on it in my free time - it's currently in active development; verbose debug statements will be removed and lack of organization will be improved! I promise! OpenGL is used only to display the rendered image. I also use glm's math library.
 </p>
 
 #### Sources I referenced heavily while working on this:
