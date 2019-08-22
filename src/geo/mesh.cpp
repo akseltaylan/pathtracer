@@ -51,12 +51,12 @@ bool mesh::get_data(const char * filepath) {
 			while (!ss.eof()) {
 				int pIdx, vIdx, nIdx = 0;
 				sscanf(fstr.c_str(), "%d/%d/%d", &pIdx, &vIdx, &nIdx);
-				fpts.push_back(pIdx - 1);
-				v_idxs.push_back(pIdx - 1);
-				fuvs.push_back(vIdx - 1);
-				uv_idxs.push_back(vIdx - 1);
-				fnormals.push_back(nIdx - 1);
-				n_idxs.push_back(nIdx - 1);
+				fpts.push_back(abs(pIdx) - 1);
+				v_idxs.push_back(abs(pIdx) - 1);
+				fuvs.push_back(abs(vIdx) - 1);
+				uv_idxs.push_back(abs(vIdx) - 1);
+				fnormals.push_back(abs(nIdx) - 1);
+				n_idxs.push_back(abs(nIdx) - 1);
 				ss >> fstr;
 			}
 			
@@ -87,21 +87,6 @@ void mesh::populate_normals() {
 	}
 }
 
-void mesh::set_to_origin() {
-	
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 640.0f / 480.0f, 0.1f, 100.0f);
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 1000), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-	glm::mat4 model = transform;
-	glm::mat4 mvp = projection * view * model;
-
-	/*
-	for (int i = 0; i < vertices.size(); ++i) {
-		glm::vec4 pt = glm::vec4(vertices[i], 1.0f);
-		pt = glm::mat4(1.0f) * pt;
-		vertices[i] = glm::vec3(pt.x, pt.y, pt.z);
-	}*/
-}
-
 mesh::mesh(const char * filepath) {
 	vertices = std::vector<glm::vec3>();
 	uvs = std::vector<glm::vec2>();
@@ -113,8 +98,6 @@ mesh::mesh(const char * filepath) {
 	num_tris = 0;
 	get_data(filepath);
 	populate_normals();
-	set_to_origin();
-
 }
 
 void mesh::debug(const char * filepath) {
@@ -187,12 +170,13 @@ void mesh::compute_bounds(glm::vec3 plane_set_normal, std::vector<float>& ds) co
 	ds[1] = d_far;
 }
 
-float clamp(float a, float min, float max) { return a < min ? min : a > max ? max : a; }
-
 void mesh::get_shading_properties(glm::vec3& phit, glm::vec3& normal, const float& t_near,
 								  const float& u, const float& v, const int& idx, const ray& r, glm::vec2& uv_coords) const {
 	phit = r.evaluate(t_near);
 	bool smooth = true;
+	if (idx > faces.size() || idx < 0) {
+		std::cerr << "get_shading_properties: " << "idx value " << idx << " is out of range of face array" << std::endl;
+	}
 	if (!smooth) {
 		const glm::vec3 v0 = vertices[faces[idx].pts[0]];
 		const glm::vec3 v1 = vertices[faces[idx].pts[1]];

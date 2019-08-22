@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include "light.h"
 #include "../geo/mesh.h"
+#include <random>
 
 class area_light: public light {
 	public:

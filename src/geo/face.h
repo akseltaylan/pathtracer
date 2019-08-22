@@ -27,9 +27,6 @@ class face {
 		glm::vec3 get_normal(std::vector<glm::vec3>, bool);
 		glm::vec3 get_normal();
 
-	private:
-		bool isQuad;
-
 };
 
 #endif

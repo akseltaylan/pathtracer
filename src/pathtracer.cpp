@@ -1,16 +1,27 @@
 #include "pathtracer.h"
-#define GI false
+
 std::default_random_engine generator;
-std::uniform_real_distribution<float> distribution(0, 1);
+std::uniform_real_distribution<float> distr(0.0f, 1.0f);
+
+float pathtracer::rand_gen(short unsigned* seed) {
+	return distr(generator);
+}
 
 pathtracer::pathtracer() {
 	image * im;
+	samples = 8;
 	img = im;
 	eyept = glm::vec3(0.0f, 0.0f, 1000.0f);
 }
 
 pathtracer::pathtracer(image * m_img) {
+	int spp;
+	std::cout << "How many samples per pixel? " << std::endl;
+	while (std::cin >> spp && spp < 4) {
+		std::cout << "Try again, how many samples per pixel? " << std::endl;
+	}
 	img = m_img;
+	samples = spp;
 	pixels = new float[3 * img->width * img->height];
 	eyept = glm::vec3(0.0f, 0.0f, 1000.0f);
 }
@@ -19,19 +30,6 @@ void pathtracer::set_scene(scene * _s) {
 	eyept = _s->get_camera();
 	accel_struct = new bvh(_s);
 	s = _s;
-}
-
-bool pathtracer::in_shadow(const ray& r, const glm::vec3& normal) {
-	const float bias = .001f;
-		
-	ray shadow_ray(r.p, normalize(r.v - r.p));
-	shadow_ray.p = r.p + bias * normal;
-	float t = std::numeric_limits<float>::infinity();
-	float u = std::numeric_limits<float>::infinity();
-	float v = std::numeric_limits<float>::infinity();
-	int idx = -1;
-	const object * hitobj = trace(shadow_ray, t, idx, u, v);
-	return hitobj != nullptr && !hitobj->is_light;
 }
 
 void pathtracer::shade_coord_system(const glm::vec3& normal, glm::vec3& n_t, glm::vec3& n_b) {
@@ -59,57 +57,43 @@ glm::vec3 pathtracer::convert_sample(const glm::vec3& n_t, const glm::vec3& n_b,
 	return glm::vec3(x, y, z);
 }
 
-glm::vec3 pathtracer::compute_direct_lighting(const object * obj, const glm::vec3& phit, const glm::vec3& hit_normal, const bool& is_light) {
-	if (!is_light) {
-		
-		glm::vec3 dl_contrib(0.0f, 0.0f, 0.0f);
-		
-		glm::vec3 ambient(0.0f);
-		glm::vec3 diffuse(0.0f);
-		glm::vec3 specular(0.0f);
+ray pathtracer::refract(const ray& r, const glm::vec3& hit_normal, const float& nc,  const float& ior) {
+	float cos_i = glm::dot(r.v, hit_normal) < -1.0f ? -1.0f : glm::dot(r.v, hit_normal) > 1.0f ? 1.0f : glm::dot(r.v, hit_normal);
+	float etai = nc;
+	float etat = ior;
+	glm::vec3 n = hit_normal;
+	if (cos_i < 0.0f) cos_i = -cos_i;
+	else {
+		std::swap(etai, etat);
+		n = -n;
+	}
+	float eta = etai / etat;
+	float k = 1.0f - eta * eta * (1.0f - cos_i * cos_i);
+	return ray(r.p, k < 0.0f ? glm::vec3(0.0f) : normalize( eta * r.v + (eta * cos_i - sqrtf(k)) * n));
+}
 
-		// compute ambient contribution
-		const std::vector<light *>& lights = accel_struct->s->get_lights();
-		ambient = obj->get_material()->ka * glm::vec3(0.4f) * lights[0]->get_intensity();
+ray pathtracer::reflect(const ray& r, const glm::vec3& phit, const glm::vec3& hit_normal) {
+	return ray(phit, r.v - hit_normal * 2.0f * glm::dot(hit_normal, r.v));
+}
 
-		// go through every light in scene	
-		for (int i = 0; i < lights.size(); ++i) {
-
-			if (!in_shadow(ray(phit, lights[i]->get_pos()), hit_normal)) {
-
-				// compute diffuse contribution of light
-				glm::vec3 l_m = normalize(lights[i]->get_pos() - phit);
-				if (glm::dot(l_m, hit_normal) > 0) diffuse += lights[i]->get_color() * lights[i]->get_intensity() * obj->get_material()->kd * glm::dot(l_m, hit_normal);
-
-				// compute specular contribution of light
-				glm::vec3 r_m = reflected(-1.f * l_m, hit_normal);
-				glm::vec3 view = normalize(eyept - phit);
-				if (glm::dot(r_m, view) > 0 && glm::dot(l_m, hit_normal) > 0) {
-					specular += obj->get_material()->ks * lights[i]->get_intensity() * powf(glm::dot(r_m, view), obj->get_material()->alpha);
-				}
-			}
-		}
-
-		//dl_contrib += ambient;
-		dl_contrib += diffuse;
-		//dl_contrib += specular;
-
-		return dl_contrib / (float) lights.size();
-		/*
-		const std::vector<light *>& lights = accel_struct->s->get_lights();
-		for (int i = 0; i < lights.size(); ++i) {
-			if (!in_shadow(ray(phit, lights[i]->get_pos()), hit_normal)) {
-				glm::vec3 light_dir = phit - lights[i]->get_pos();
-				dl_contrib += lights[i]->get_color() * lights[i]->get_intensity() * std::max(0.0f, glm::dot(hit_normal, -1.0f * light_dir));
-			}
-		}
-		return dl_contrib;*/
+void pathtracer::fresnel(const ray& r, const glm::vec3& hit_normal, const float& nc, const float& ior, float& fres) {
+	float cos_i = glm::dot(r.v, hit_normal) < -1.0f ? -1.0f : glm::dot(r.v, hit_normal) > 1.0f ? 1.0f : glm::dot(r.v, hit_normal);
+	float etai = nc;
+	float etat = ior;
+	if (cos_i > 0.0f) std::swap(etai, etat);
+	float sin_t = etai / etat * sqrtf(std::max(0.0f, 1.0f - cos_i * cos_i)); // Snell's law
+	// TIR
+	if (sin_t >= 1.0f) {
+		fres = 1.0f;
 	}
 	else {
-		return obj->get_albedo();
-
+		float cos_t = sqrtf(std::max(0.0f, 1.0f - sin_t * sin_t));
+		cos_i = fabsf(cos_i);
+		float r_s = ((etat * cos_i) - (etai * cos_t)) / ((etat * cos_i) + (etai * cos_t));
+		float r_p = ((etai * cos_i) - (etat * cos_t)) / ((etai * cos_i) + (etat * cos_t));
+		fres = (r_s * r_s + r_p * r_p) / 2.0f;
 	}
-	return glm::vec3(0.0f);
+
 }
 
 const object * pathtracer::trace(const ray & r, float & t_near, int& tri_idx, float& u, float& v) {
@@ -119,73 +103,79 @@ const object * pathtracer::trace(const ray & r, float & t_near, int& tri_idx, fl
 	return hit_obj;
 }
 
-glm::vec3 pathtracer::cast(const ray & r, const int & depth) {
-	if (depth > MAX_DEPTH) return glm::vec3(0.0f);
+glm::vec3 pathtracer::cast(const ray & r, const int & depth, unsigned short* seed) {
 	++num_rays;
-	glm::vec3 hit_color = glm::vec3(0.0f, 0.0f, 0.0f);
+
 	float t_near = std::numeric_limits<float>::infinity();
 	float u = std::numeric_limits<float>::infinity();
 	float v = std::numeric_limits<float>::infinity();
 	int tri_idx = -1;
 	const object * obj = trace(r, t_near, tri_idx, u, v);
-	if (obj != nullptr) {
-		glm::vec3 phit = glm::vec3(0.0f);
-		glm::vec3 hit_normal = glm::vec3(0.0f);
-		glm::vec2 uv_coords;
-		obj->get_shading_properties(phit, hit_normal, t_near, u, v, tri_idx, r, uv_coords);
-		if (obj->is_light) return obj->get_albedo();
-		glm::vec3 col = obj->get_material()->get_albedo(uv_coords);
-		
-		glm::vec3 dl = compute_direct_lighting(obj, phit, hit_normal, obj->is_light);
-		// global illumination
-		glm::vec3 il = glm::vec3(0.0f);
-		if (GI) {
-			int samples = 8;
-			float pdf = 1.0f / (2.0f * PI);
 
-			// compute shaded point coordinate system using hit_normal
-			glm::vec3 n_t = glm::vec3(0.0f);
-			glm::vec3 n_b = glm::vec3(0.0f);
-			shade_coord_system(hit_normal, n_t, n_b);
+	if (obj == nullptr) {
+		return s->bg_color;
+	}
 
-			for (int i = 0; i < samples; ++i) {
-				
-				// russian roulette termination
-				float p = col.r > col.g && col.r > col.b ? col.r : col.g > col.b ? col.g : col.b;								
-				float rint = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
-				if (depth > 5) {
-					if (rint < p * 0.9f) {
-						col = col * (0.9f / p);
-					}
-					else {
-						return glm::vec3(0.0f);
-					}
-				}
+	glm::vec3 phit = glm::vec3(0.0f);
+	glm::vec3 hit_normal = glm::vec3(0.0f);
+	glm::vec2 uv_coords;
+	obj->get_shading_properties(phit, hit_normal, t_near, u, v, tri_idx, r, uv_coords);
+	glm::vec3 col = obj->get_material()->get_albedo(uv_coords);
 
-				// create samples on the hemisphere
-				float rint1 = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
-				float rint2 = static_cast<float> (rand()) / static_cast<float> (RAND_MAX);
-				//float rint1 = distribution(generator);
-				//float rint2 = distribution(generator);
-
-				glm::vec3 sample = get_uniform_hemisphere_sample(rint1, rint2);
-				glm::vec3 new_dir = convert_sample(n_t, n_b, hit_normal, sample);
-
-				il += rint1 * cast(ray(phit + new_dir * 0.001f, new_dir), depth + 1) / pdf;
-			}
-			il /= (float)samples;
-			hit_color = (2.0f*il + dl) / PI * col;
+	// global illumination
+	glm::vec3 il = glm::vec3(0.0f);
+	// russian roulette termination
+	float p = col.r > col.g && col.r > col.b ? col.r : col.g > col.b ? col.g : col.b;
+	if (depth > 5) {
+		if (rand_gen(seed) > p || !p) {
+			col = col * (1.0f / p);
 		}
 		else {
-			hit_color = dl * col;
+			return glm::vec3(0.0f);
 		}
+	}
+
+	float pdf = 1.0f / (2.0f * PI);
+	glm::vec3 normal_l = glm::dot(hit_normal, r.v) < 0.0f ? hit_normal : hit_normal * -1.0f;
+
+	if (obj->get_material()->mtype == material::mat_type::diffuse) {
+		// compute shaded point coordinate system using hit_normal
+		glm::vec3 n_t = glm::vec3(0.0f);
+		glm::vec3 n_b = glm::vec3(0.0f);
+		shade_coord_system(hit_normal, n_t, n_b);
+
+		// create samples on the hemisphere
+		float rint1 = rand_gen(seed);
+		float rint2 = rand_gen(seed);
+
+		glm::vec3 sample = get_uniform_hemisphere_sample(rint1, rint2);
+		glm::vec3 new_dir = convert_sample(n_t, n_b, hit_normal, sample);
+		return  obj->get_material()->emissive + col * rint1 * (cast(ray(phit + new_dir * 0.001f, new_dir), depth + 1, seed)) / pdf;
+	}
+	else if (obj->get_material()->mtype == material::mat_type::specular) {
+		return obj->get_material()->emissive + col * cast(reflect(r, phit, hit_normal), depth + 1, seed)  ;
+	}
+	else if (obj->get_material()->mtype == material::mat_type::glass) {
+		float fres = 0.0f;
+		float nc = 1.0f;
+		float ior = 1.5f;
+		fresnel(r, hit_normal, nc, ior, fres);
+		bool into = glm::dot(hit_normal, r.v) > 0.0f;
+		glm::vec3 bias = hit_normal * 0.00001f;
+		glm::vec3 refr_col = glm::vec3(0.0f);
+		ray orig;
+		if (fres < 1.0f) {
+			orig = ray(into ? phit + bias : phit - bias, r.v);
+			refr_col = obj->get_material()->emissive + col * cast(refract(orig, hit_normal, nc, ior), depth+1, seed);
+		}
+		orig = ray(into ? phit - bias : phit + bias, r.v);
+		ray refl = reflect(orig, phit, hit_normal);
+		glm::vec3 refl_col = obj->get_material()->emissive + col * cast(refl, depth + 1, seed);
+		return refl_col * fres + refr_col * (1.0f - fres);
 	}
 	else {
-		if (depth == 0) {
-			hit_color = s->bg_color;
-		}
+		return glm::vec3(0.0f);
 	}
-	return hit_color;
 }
 
 void pathtracer::render() {
@@ -198,20 +188,26 @@ void pathtracer::render() {
 	std::vector<object*> objs = accel_struct->s->get_objs();
 
 	int pixel_ct = 1;
+	float gamma = 1.0f/2.2f;
 	
-#pragma omp parallel for schedule(dynamic, 2)
+#pragma omp parallel for schedule(dynamic, 2) 
 	for (int i = 0; i < img->height; ++i) {
+		fprintf(stderr, "\rRendering (%d spp)...", samples);
 		for (int j = 0; j < img->width; ++j) {
-
+			unsigned short seed[3] = { 0,0,j*j*j };
 			auto start = std::chrono::high_resolution_clock::now();
 			glm::vec3 pixel_color(0.0f, 0.0f, 0.0f);
-			int samples = 4;
+			int jitter = -1;
 			for (int k = 0; k < samples; ++k) {
-				glm::vec3 cur_pixel = ip->nextpixel(k, j, i);
+				++jitter;
+				if (jitter % 4 == 0) jitter = 0;
+				glm::vec3 cur_pixel = ip->nextpixel(jitter, j, i);
 				ray primary_ray(eyept, cur_pixel - eyept);
-				pixel_color += cast(primary_ray, 0);
+				pixel_color += cast(primary_ray, 0, seed)*(1.0f/(float)samples);
 			}
-			img->set_pixel(j, i, pixel_color / (float) samples);
+			
+			pixel_color = glm::vec3(powf(pixel_color.r, gamma), powf(pixel_color.g, gamma), powf(pixel_color.b, gamma)); // gamma correction
+			img->set_pixel(j, i, pixel_color);
 			
 			if (PIXEL_DEBUG) {
 				if (pixel_ct % 10000 == 0) {
@@ -220,6 +216,7 @@ void pathtracer::render() {
 					std::cout << "Computed pixel " << pixel_ct << " in " << duration / 1000 << " seconds" << std::endl;
 				}
 			}
+
 			++pixel_ct;
 		}
 	}

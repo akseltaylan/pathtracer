@@ -15,6 +15,7 @@ area_light::area_light(const glm::vec3& pos, const float& i, const glm::vec3& co
 // getter
 
 glm::vec3 area_light::get_pos() const {
-	return position;
+	int randnum = rand() % area->vertices.size();
+	return area->vertices[randnum];
 }
 

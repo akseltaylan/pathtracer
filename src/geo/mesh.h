@@ -8,7 +8,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "../math/vec2.h"
 #include "../math/utils.h"
 #include "object.h"
 #include "../ray.h"
@@ -17,7 +16,7 @@
 #include <vector>
 #include <chrono>
 
-#define DEBUG true
+#define DEBUG false
 #define MESH_DEBUG false
 
 class mesh : public object {
@@ -31,7 +30,6 @@ class mesh : public object {
 		std::vector<int> n_idxs;
 		std::vector<face> faces;
 
-		//TODO: will have a material 
 		mesh(const char *);
 		bool get_data(const char *);
 		void debug(const char *);
@@ -40,7 +38,6 @@ class mesh : public object {
 		void compute_bounds(glm::vec3, std::vector<float>&) const;
 		void get_shading_properties(glm::vec3&, glm::vec3&, const float&, const float&, const float&, const int&, const ray&, glm::vec2&) const;
 		void populate_normals();
-		void set_to_origin();
 };
 
 #endif

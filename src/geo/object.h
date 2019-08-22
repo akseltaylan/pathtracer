@@ -16,8 +16,6 @@ class object {
 		glm::vec3 albedo; // base color of object
 		material * mat;
 	public:
-		glm::mat4 transform = glm::mat4(1.0f);
-		glm::mat4 inv_transform = glm::inverse(transform);
 		bool is_light = false;
 
 		object();

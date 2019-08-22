@@ -25,9 +25,8 @@ public:
 	glm::vec3 get_camera();
 	
 	// example scene set ups
-	void bunny_setup();
-	void gl_test_setup();
-	void texture_setup();
+	void gl_sphere_setup();
+	void gl_bunny_setup();
 };
 
 #endif

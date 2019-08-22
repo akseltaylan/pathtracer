@@ -10,11 +10,9 @@
 #include "image.h"
 #include "implane.h"
 #include "ray.h"
-#include "math/vec2.h"
 #include "math/utils.h"
 #include "geo/mesh.h"
 #include "scene.h"
-#include "math/mat4.h"
 #include "accel/bvh.h"
 #include <chrono>
 #include <time.h>
@@ -23,7 +21,6 @@
 
 #define PIXEL_DEBUG false
 #define PI 3.14159265354f
-#define MAX_DEPTH 1
 
 class pathtracer {
 	public:
@@ -31,8 +28,9 @@ class pathtracer {
 		glm::vec3 eyept;
 		scene * s;
 		bvh * accel_struct;
-		int num_rays = 0;
+		long long int num_rays = 0;
 		float * pixels;
+		int samples;
 
 		pathtracer();
 		pathtracer(image*);
@@ -41,16 +39,18 @@ class pathtracer {
 		void set_scene(scene *);
 
 		// lighting/shading
-		glm::vec3 compute_direct_lighting(const object *, const glm::vec3&, const glm::vec3&, const bool&);
-		bool in_shadow(const ray&, const glm::vec3&);
 		void shade_coord_system(const glm::vec3&, glm::vec3&, glm::vec3&);
 		glm::vec3 get_uniform_hemisphere_sample(const float&, const float&);
 		glm::vec3 convert_sample(const glm::vec3&, const glm::vec3&, const glm::vec3&, const glm::vec3&);
+		ray reflect(const ray&, const glm::vec3&, const glm::vec3&);
+		ray refract(const ray&, const glm::vec3&, const float&, const float&);
+		void fresnel(const ray&, const glm::vec3&, const float&, const float&, float&);
 
 		// core rendering functionality
 		void render();
 		const object * trace(const ray&, float&, int&, float&, float&);
-		glm::vec3 cast(const ray&, const int&);
+		glm::vec3 cast(const ray&, const int&, unsigned short*);
+		float rand_gen(short unsigned *);
 };
 
 #endif
