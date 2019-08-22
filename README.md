@@ -7,7 +7,7 @@
 - Global Illumination
 - Monte Carlo Integration
 - Russian Roulette Termination
-- Triangulated meshes
+- Triangulated meshes (OBJ file reading)
 - Bounding volume hierarchy
 - Multithreaded
 - Anti-aliasing
