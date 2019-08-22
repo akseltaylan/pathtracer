@@ -6,4 +6,5 @@ This is a personal project I work on in my free time - it's currently in active 
 #### Sources I referenced heavily while working on this:
 <p>
 https://www.scratchapixel.com/ <br/>
-https://www.pbrt.org </br></p>
+https://www.pbrt.org </br>
+http://www.kevinbeason.com/smallpt/ </br></p>
